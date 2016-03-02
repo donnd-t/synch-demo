@@ -1,0 +1,66 @@
+
+This project demonstrates one possible solution for synchronising data to a Microservice
+from a legacy platform that is not exposed via a Microservice.
+
+Customer data is used as the example domain. The legacy application exposes a database for integration.
+JDBC is used to access this database. The Spring Integration project is used to demonstrate how the
+details of the legacy application can be hidden for the rest of the integration process. So, if
+the legacy application is replaced, it should be easy to modify the integration to work with a new
+application.
+
+
+1) Clone project from Git
+
+2) Start Microservice
+
+- build
+- run
+
+3) Test Microservice
+
+- check there are no customers
+curl http://localhost:8080/customer
+
+- create a customer
+curl -i -X POST -H "Content-Type:application/json" -d "{  \"name\" : \"test\" }" http://localhost:8080/customer
+
+- check for your customer
+curl http://localhost:8080/customer
+
+- search for your customer
+
+curl http://localhost:8080/customer/search/findByName?name=test
+
+4) Start the Integration application
+
+- build
+- run
+
+5) create a customer in the integration source database
+
+We need to connect to the H2 database that is the source of customer information:
+
+Download and install H2 client from http://www.h2database.com/html/main.html.
+
+Start H2 console. A browser window will open. Login with the following details:
+
+Driver Class: org.h2.Driver
+JDBC URL: jdbc:h2:mem:testdb
+User Name: sa
+Password: <blank>
+
+Click "Connect".
+
+Now insert a customer into the integration source database:
+
+insert into customer(name) values ('new customer')
+
+5) check customer is created in the Microservice database
+
+curl http://localhost:8080/customers
+
+
+
+
+
+

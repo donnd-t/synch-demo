@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-jdbc="http://www.springframework.org/schema/integration/jdbc"
+	xsi:schemaLocation="http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-4.2.xsd
+		http://www.springframework.org/schema/integration/jdbc http://www.springframework.org/schema/integration/jdbc/spring-integration-jdbc-4.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<int-jdbc:inbound-channel-adapter query="select name from customer where processed='n'"
+    	channel="jdbcInput" data-source="dataSource"
+    	update="update customer set processed='y' where name in (:name)"
+   		row-mapper="customerRowMapper">
+    	<int:poller fixed-rate="500"/>
+    </int-jdbc:inbound-channel-adapter>
+    	
+    <int:service-activator input-channel="jdbcInput" ref="jdbcEndpoint"/>
+    
+</beans>

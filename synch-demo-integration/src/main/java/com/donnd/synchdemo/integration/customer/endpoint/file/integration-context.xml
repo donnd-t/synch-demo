@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-file="http://www.springframework.org/schema/integration/file"
+	xsi:schemaLocation="http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-4.2.xsd
+		http://www.springframework.org/schema/integration/file http://www.springframework.org/schema/integration/file/spring-integration-file-4.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<int-file:inbound-channel-adapter channel="fileInput" directory="target/input" filename-pattern="*">
+		<int:poller fixed-rate="500">
+			<int:transactional transaction-manager="transactionManager" synchronization-factory="syncFactory" />
+		</int:poller>
+	</int-file:inbound-channel-adapter>
+
+	<int:service-activator input-channel="fileInput" ref="fileEndpoint"/>
+	
+	<int:transaction-synchronization-factory id="syncFactory">
+    	<int:after-commit expression="payload.delete()" channel="nullChannel"/>
+	</int:transaction-synchronization-factory>
+	
+	<bean id="transactionManager" class="org.springframework.integration.transaction.PseudoTransactionManager" />
+    
+</beans>
